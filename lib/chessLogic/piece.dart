@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:chess/pages/game.dart';
+import 'package:chess_game/pages/game.dart';
 
 import 'king.dart';
 import 'queen.dart';
@@ -14,13 +14,12 @@ abstract class Piece {
   ///player = false -> semi-white (0xffc3ccc8) player
   ///
   ///player = true  -> black player
-  Piece(int xPosition, yPosition, [bool player]) {
-    this.xPosition = xPosition;
-    this.yPosition = yPosition;
-    this.location = xPosition + yPosition;
+  Piece(this.xPosition, this.yPosition, [bool? player]) {
+    location = xPosition + yPosition;
     // player = null when we create Empty object -> pieceColor = null
-    if (player != null)
-      this.pieceColor = player ? Color(0xff000000) : Color(0xffc3ccc8);
+    if (player != null) {
+      pieceColor = player ? const Color(0xff000000) : const Color(0xffc3ccc8);
+    }
   }
 
   ///the x position of the piece represented as :
@@ -32,39 +31,42 @@ abstract class Piece {
   int yPosition;
 
   ///location of the piece = x + y .
-  int location;
+  late int location;
 
   ///semi-white (0xffc3ccc8) or black
-  Color pieceColor;
+  Color? pieceColor;
 
   ///The widget that represent the piece
-  Widget pieceImageIcon;
+  Widget? pieceImageIcon;
 
   ///used only for pawn only
   bool firstMovement = true;
 
   ///each key in the map represent the location of one piece.
   ///each value in the map represent the piece that dominate the location(key).
-  static Map<int, Piece> allPieces = Map<int, Piece>();
+  static Map<int, Piece> allPieces = {};
 
-  static List<Piece> blackPieces = List<Piece>();
+  static List<Piece> blackPieces = [];
 
   ///determine the locations where the piece can move to
-  List<int> movement;
+  List<int>? movement;
 
   ///initialize the movement of the piece
-  List<int> generateMovement();
+  List<int>? generateMovement();
 
   Color pieceBackgroundColor = Colors.transparent;
 
   ///return all pieces to it's origin location in the [Piece.allPieces] map
   static Map<int, Piece> returnAllPiecesToItsLocations() {
     player = false;
-    playerColor = Color(0xffc3ccc8);
+    playerColor = const Color(0xffc3ccc8);
 
     //clear all the pieces between the white and black players
-    for (int x = 10; x <= 80; x += 10)
-      for (int y = 3; y <= 6; y++) Piece.allPieces[x + y] = Empty(x, y);
+    for (int x = 10; x <= 80; x += 10) {
+      for (int y = 3; y <= 6; y++) {
+        Piece.allPieces[x + y] = Empty(x, y);
+      }
+    }
 
     //First line for white player
     Piece.allPieces[11] = Rock(10, 1, false);
@@ -101,21 +103,22 @@ abstract class Piece {
 
   ///update Piece location than update movement
   updatePieceLocation(int newX, int newY) {
-    this.xPosition = newX;
-    this.yPosition = newY;
-    this.location = xPosition + yPosition;
+    xPosition = newX;
+    yPosition = newY;
+    location = xPosition + yPosition;
   }
 
   static initializeBlackPiecesMap() {
-    blackPieces = List<Piece>();
-    for (Piece piece in allPieces.values)
-      if (piece?.pieceColor == Colors.black) blackPieces.add(piece);
+    blackPieces = [];
+    for (Piece piece in allPieces.values) {
+      if (piece.pieceColor == Colors.black) blackPieces.add(piece);
+    }
   }
 
   ///Random movement for black player (single player mode)
   ///[multiPlayerMode] must = false
   static int generateRandomMovement(BuildContext context) {
-    int firstLocation ;
+    late int firstLocation;
 
     //shuffle blackPieces list to get random arrangement
     blackPieces.shuffle();
@@ -127,23 +130,23 @@ abstract class Piece {
       Piece piece = blackPieces[i];
       piece.movement = piece.generateMovement();
 
-      if (piece.movement.length > 0) {
+      if (piece.movement!.isNotEmpty) {
         //shuffle the movement list to get random arrangement
-        piece.movement.shuffle();
+        piece.movement!.shuffle();
         firstLocation = piece.location;
         //replace the location of the piece (before moving) to empty
         allPieces[piece.location] = Empty(piece.xPosition, piece.yPosition);
 
-        if (allPieces[piece.movement.first] is King) {
-          GameState.showEndGameAlertDialog (context , piece.pieceColor);
+        if (allPieces[piece.movement!.first] is King) {
+          GameState.showEndGameAlertDialog(context, piece.pieceColor!);
           endGame = true;
         }
 
         //replace the target location to the piece location
-        allPieces[piece.movement.first] = piece;
+        allPieces[piece.movement!.first] = piece;
 
-        int x = int.parse(piece.movement.first.toString().substring(0, 1)) * 10;
-        int y = int.parse(piece.movement.first.toString().substring(1, 2));
+        int x = int.parse(piece.movement!.first.toString().substring(0, 1)) * 10;
+        int y = int.parse(piece.movement!.first.toString().substring(1, 2));
         piece.updatePieceLocation(x, y);
         blackPieces[i] = piece;
         break;
@@ -151,7 +154,7 @@ abstract class Piece {
     }
 
     player = false;
-    playerColor = Color(0xffc3ccc8);
+    playerColor = const Color(0xffc3ccc8);
 
     return firstLocation;
   }

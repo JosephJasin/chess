@@ -1,14 +1,14 @@
 //[completed]
 import 'package:flutter/material.dart';
 
-import 'package:chess/chessLogic/piece.dart';
-import 'package:chess/pages/home.dart' show widthOrHeight;
+import 'package:chess_game/chessLogic/piece.dart';
+import 'package:chess_game/pages/home.dart' show widthOrHeight;
 
 class Knight extends Piece {
   Knight(int xPosition, yPosition, bool player)
       : super(xPosition, yPosition, player) {
     pieceImageIcon = ImageIcon(
-      AssetImage('assets/chessIcons/knight.png'),
+      const AssetImage('assets/chessIcons/knight.png'),
       color: pieceColor,
       size: widthOrHeight,
     );
@@ -17,7 +17,7 @@ class Knight extends Piece {
 
   @override
   List<int> generateMovement() {
-    List<int> movementList = List<int>();
+    List<int> movementList = [];
 
     //moving to top-right
     if (xPosition + 20 <= 80 &&

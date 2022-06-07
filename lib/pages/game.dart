@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 
 import 'package:timer_builder/timer_builder.dart';
 
-import 'home.dart' show widthOrHeight;
-import 'package:chess/chessLogic/piece.dart';
-import 'package:chess/chessLogic/empty.dart';
-import 'package:chess/chessLogic/king.dart';
+import 'package:chess_game/chessLogic/piece.dart';
+import 'package:chess_game/chessLogic/empty.dart';
+import 'package:chess_game/chessLogic/king.dart';
+
+import 'home.dart';
 
 ///false -> semi-white (0xffc3ccc8) player
 ///true -> black player
 bool player = false;
-Color playerColor = Color(0xffc3ccc8);
+Color playerColor = const Color(0xffc3ccc8);
 bool endGame = false;
 bool multiPlayerMode = true;
 
 class Game extends StatefulWidget {
+  const Game({Key? key}) : super(key: key);
+
   @override
   GameState createState() => GameState();
 }
@@ -50,19 +53,18 @@ class GameState extends State<Game> {
             //Timer
             centerTitle: true,
             title: TimerBuilder.periodic(
-              Duration(seconds: 1),
+              const Duration(seconds: 1),
               builder: (context) => Text(
-                    'Time : ${_time++}',
-                    style:
-                        TextStyle(color: player ? Colors.black : Colors.white),
-                  ),
+                'Time : ${_time++}',
+                style: TextStyle(color: player ? Colors.black : Colors.white),
+              ),
             ),
 
             //Exit
             actions: <Widget>[
               IconButton(
                   tooltip: 'Close the game',
-                  icon: Icon(Icons.close),
+                  icon: const Icon(Icons.close),
                   color: player ? Colors.black : Colors.white,
                   onPressed: () => showExitAlertDialog(context)),
             ],
@@ -103,22 +105,34 @@ class GameState extends State<Game> {
   //show AlertDialog to ensure if the player want to exit the game [completed]
   showExitAlertDialog(BuildContext context) {
     AlertDialog alertDialog = AlertDialog(
-      title: Text('Close the game ?'),
-      actions: <Widget>[
+      title: const Text('Close the game ?'),
+      actions: [
         //Press no to return to game page
-        RaisedButton(
-          textColor: Color(0xff00a4aa),
-          color: Colors.white,
-          child: Text('No'),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'No',
+            style: TextStyle(
+              color: Color(0xff00a4aa),
+            ),
+          ),
         ),
 
         //Press yes to close the game page and return to home page
-        RaisedButton(
-          textColor: Color(0xff00a4aa),
-          color: Colors.white,
-          child: Text('Yes'),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.white,
+          ),
           onPressed: () => Navigator.pushReplacementNamed(context, 'home'),
+          child: const Text(
+            'Yes',
+            style: TextStyle(
+              color: Color(0xff00a4aa),
+            ),
+          ),
         ),
       ],
     );
@@ -132,7 +146,7 @@ class GameState extends State<Game> {
 
     SimpleDialog alertDialog = SimpleDialog(
       title: Text('$winner wins', style: TextStyle(color: winnerColor)),
-      titlePadding: EdgeInsets.all(10),
+      titlePadding: const EdgeInsets.all(10),
     );
 
     showDialog<SimpleDialog>(
@@ -142,7 +156,7 @@ class GameState extends State<Game> {
   //building a single row in the chessBoard
   //row number must be >= 1  && <= 8
   Row _buildRow(int rowNumber) {
-    List<Widget> rowChildren = List<Widget>();
+    List<Widget> rowChildren = [];
 
     //determine the color of the blocks
     //false -> specialBlue , true -> white
@@ -150,24 +164,27 @@ class GameState extends State<Game> {
     rowNumber % 2 == 0 ? blockColor = true : blockColor = false;
 
     for (int x = 10; x <= 80; x += 10, blockColor = !blockColor) {
-      Piece currentPiece = Piece.allPieces[x + rowNumber];
+      Piece currentPiece = Piece.allPieces[x + rowNumber]!;
       rowChildren.add(Expanded(
         //width & Height & color of each block
         child: Container(
           height: widthOrHeight,
           width: widthOrHeight,
-          color: blockColor ? Colors.white : Color(0xff00a4aa),
+          color: blockColor ? Colors.white : const Color(0xff00a4aa),
 
           //each block is dragTarget
           child: DragTarget<Piece>(
-            builder: (context, List<Piece> dataList, ignore) {
+            builder: (context, dataList, ignore) {
               //empty block
               if (currentPiece is Empty) {
                 return Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: currentPiece.pieceBackgroundColor,
-                            width: 2)));
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: currentPiece.pieceBackgroundColor,
+                      width: 2,
+                    ),
+                  ),
+                );
               }
 
               // non empty block
@@ -177,50 +194,52 @@ class GameState extends State<Game> {
                   maxSimultaneousDrags:
                       playerColor == currentPiece.pieceColor ? 1 : 0,
                   data: currentPiece,
+                  feedback: currentPiece.pieceImageIcon!,
+                  childWhenDragging: Container(),
                   child: Stack(
-                    children: <Widget>[
+                    children: [
                       Container(color: currentPiece.pieceBackgroundColor),
-                      currentPiece.pieceImageIcon
+                      currentPiece.pieceImageIcon!
                     ],
                   ),
-                  feedback: currentPiece.pieceImageIcon,
-                  childWhenDragging: Container(),
                 );
               }
               //for single player game
               else {
-                if (currentPiece.pieceColor == Color(0xffc3ccc8)) {
+                if (currentPiece.pieceColor == const Color(0xffc3ccc8)) {
                   return Draggable<Piece>(
                     maxSimultaneousDrags:
-                        playerColor == Color(0xffc3ccc8) ? 1 : 0,
+                        playerColor == const Color(0xffc3ccc8) ? 1 : 0,
                     data: currentPiece,
-                    child: currentPiece.pieceImageIcon,
-                    feedback: currentPiece.pieceImageIcon,
+                    feedback: currentPiece.pieceImageIcon!,
                     childWhenDragging: Container(),
+                    child: currentPiece.pieceImageIcon!,
                   );
-                } else
+                } else {
                   return Stack(children: <Widget>[
                     Container(color: currentPiece.pieceBackgroundColor),
-                    currentPiece.pieceImageIcon
+                    currentPiece.pieceImageIcon!
                   ]);
+                }
               }
             },
             onWillAccept: (piece) {
-              piece.movement = piece.generateMovement();
+              piece!.movement = piece.generateMovement();
 
-              for (int index in piece.movement) {
+              for (int index in piece.movement!) {
                 setState(() =>
-                    Piece.allPieces[index].pieceBackgroundColor = Colors.red);
+                    Piece.allPieces[index]!.pieceBackgroundColor = Colors.red);
               }
 
-              if (piece.movement.contains(currentPiece.location))
+              if (piece.movement!.contains(currentPiece.location)) {
                 return true;
-              else
+              } else {
                 return false;
+              }
             },
             onAccept: (piece) async {
-              for (int index in piece.movement) {
-                setState(() => Piece.allPieces[index].pieceBackgroundColor =
+              for (int index in piece.movement!) {
+                setState(() => Piece.allPieces[index]!.pieceBackgroundColor =
                     Colors.transparent);
               }
 
@@ -233,7 +252,7 @@ class GameState extends State<Game> {
               Piece.allPieces[currentPiece.location] = piece;
 
               if (currentPiece is King) {
-                showEndGameAlertDialog(context, piece.pieceColor);
+                showEndGameAlertDialog(context, piece.pieceColor!);
                 setState(() => endGame = true);
               }
 
@@ -248,7 +267,7 @@ class GameState extends State<Game> {
 
               setState(() {
                 player = !player;
-                playerColor = player ? Colors.black : Color(0xffc3ccc8);
+                playerColor = player ? Colors.black : const Color(0xffc3ccc8);
               });
 
               if (!multiPlayerMode) {
@@ -256,8 +275,8 @@ class GameState extends State<Game> {
               }
             },
             onLeave: (piece) {
-              for (int index in piece.movement) {
-                setState(() => Piece.allPieces[index].pieceBackgroundColor =
+              for (int index in piece!.movement!) {
+                setState(() => Piece.allPieces[index]!.pieceBackgroundColor =
                     Colors.transparent);
               }
             },

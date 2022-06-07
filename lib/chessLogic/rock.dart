@@ -1,16 +1,16 @@
 //[completed]
 
-import 'package:chess/chessLogic/empty.dart';
+import 'package:chess_game/chessLogic/empty.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chess/chessLogic/piece.dart';
-import 'package:chess/pages/home.dart' show widthOrHeight;
+import 'package:chess_game/chessLogic/piece.dart';
+import 'package:chess_game/pages/home.dart' show widthOrHeight;
 
 class Rock extends Piece {
   Rock(int xPosition, yPosition, bool player)
       : super(xPosition, yPosition, player) {
     pieceImageIcon = ImageIcon(
-      AssetImage('assets/chessIcons/rook.png'),
+      const AssetImage('assets/chessIcons/rook.png'),
       color: pieceColor,
       size: widthOrHeight,
     );
@@ -19,7 +19,7 @@ class Rock extends Piece {
 
   @override
   List<int> generateMovement() {
-    List<int> movementList = List<int>();
+    List<int> movementList = [];
 
     //moving up
     for (int y = yPosition + 1; y <= 8; y++) {

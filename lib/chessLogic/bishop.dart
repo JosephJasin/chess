@@ -1,15 +1,15 @@
 //[completed]
 import 'package:flutter/material.dart';
 
-import 'package:chess/chessLogic/piece.dart';
-import 'package:chess/chessLogic/empty.dart';
-import 'package:chess/pages/home.dart' show widthOrHeight;
+import 'package:chess_game/chessLogic/piece.dart';
+import 'package:chess_game/chessLogic/empty.dart';
+import 'package:chess_game/pages/home.dart' show widthOrHeight;
 
 class Bishop extends Piece {
   Bishop(int xPosition, yPosition, bool player)
       : super(xPosition, yPosition, player) {
     pieceImageIcon = ImageIcon(
-      AssetImage('assets/chessIcons/bishop.png'),
+      const AssetImage('assets/chessIcons/bishop.png'),
       size: widthOrHeight,
       color: pieceColor,
     );
@@ -19,7 +19,7 @@ class Bishop extends Piece {
 
   @override
   List<int> generateMovement() {
-    List<int> diagonalMovement = List<int>();
+    List<int> diagonalMovement = [];
 
     //diagonal movement(from piece location to top-right)
     for (int x = xPosition + 10, y = yPosition + 1;
